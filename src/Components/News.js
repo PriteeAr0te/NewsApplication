@@ -17,29 +17,22 @@ const News = (props) => {
   const updateNews = async () => {
     try {
       props.setProgress(10);
-      const response = await fetchNewsData(page);
+      let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&apiKey=${props.apiKey}&category=${props.category}&page=${page}&pageSize=${props.pageSize}`;
+      // this.setState({loading:true});
+      setLoading(true);
+      let data = await fetch(url);
       props.setProgress(30);
-      setArticles(response.articles);
-      setTotalResults(response.totalResults);
+      let parseData = await data.json();
+      console.log(parseData);
+      props.setProgress(70);
+      setArticles(parseData.articles);
+      setTotalResults(parseData.totalResults);
       setLoading(false);
       props.setProgress(100);
     } catch (error) {
       console.error("Error fetching data:", error);
       setLoading(false);
     }
-  };
-
-  const fetchNewsData = async (page) => {
-    const response = await fetch(`/.netlify/functions/newsProxy`, {
-      method: "POST",
-      body: JSON.stringify({
-        country: props.country,
-        category: props.category,
-        page: page,
-        pageSize: props.pageSize,
-      }),
-    });
-    return await response.json();
   };
 
   useEffect(() => {
@@ -49,18 +42,27 @@ const News = (props) => {
 
   const fetchMoreData = async () => {
     try {
-      const nextPage = page + 1;
-      const response = await fetchNewsData(nextPage);
-      setArticles((prevArticles) => [...prevArticles, ...response.articles]);
-      setTotalResults(response.totalResults);
-      setPage(nextPage);
+      let url = `https://newsapi.org/v2/top-headlines?country=${
+        props.country
+      }&apiKey=${props.apiKey}&category=${props.category}&page=${
+        page + 1
+      }&pageSize=${props.pageSize}`;
+      setPage(page + 1);
+      // setLoading(true)
+      let data = await fetch(url);
+      let parseData = await data.json();
+      setArticles((prevArticles) => [...prevArticles, ...parseData.articles]);
+      setTotalResults(parseData.totalResults);
+      setLoading(false);
+      // setPage(nextPage)
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
 
-  const hasArticles = articles && articles.length > 0;
-  const hasMore = hasArticles && articles.length < totalResults;
+  const hasArticles = (articles && articles.length) > 0;
+  const hasMore = (hasArticles && articles.length) < totalResults;
 
   return (
     <>
@@ -73,30 +75,33 @@ const News = (props) => {
         </h2>
         {loading && <Loading />}
         <InfiniteScroll
-          dataLength={articles.length}
+          dataLength={articles?.length ? articles.length : 0}
+          // dataLength={articles.length}
           next={fetchMoreData}
           hasMore={hasMore}
           loader={<Loading />}
         >
           <div className="container">
-            <div className="row">
-              {articles.map((element, index) => (
-                <div className="col-md-4" key={index}>
-                  <NewsItem
-                    title={element.title || ""}
-                    description={
-                      element.description
-                        ? element.description.slice(0, 88)
-                        : ""
-                    }
-                    imageUrl={element.urlToImage}
-                    url={element.url}
-                    author={element.author}
-                    date={element.publishedAt}
-                    source={element.source.name}
-                  />
-                </div>
-              ))}
+            <div className="row ">
+              {articles?.map((element, index) => {
+                return (
+                  <div className="col-md-4" key={index}>
+                    <NewsItem
+                      title={element.title ? element.title : ""}
+                      description={
+                        element.description
+                          ? element.description.slice(0, 88)
+                          : ""
+                      }
+                      imageUrl={element.urlToImage}
+                      url={element.url}
+                      author={element.author}
+                      date={element.publishedAt}
+                      source={element.source.name}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </InfiniteScroll>
@@ -108,7 +113,7 @@ const News = (props) => {
   );
 };
 
-News.defaultProps = {
+News.defaultProp = {
   country: "in",
   pageSize: 9,
   category: "general",
@@ -119,5 +124,4 @@ News.propTypes = {
   pageSize: PropTypes.number,
   category: PropTypes.string,
 };
-
 export default News;
