@@ -11,7 +11,7 @@ const App = () => {
   const pageSize = 12;
   const [progress, setProgress] = useState(0);
 
-  //  apiKey = process.env.REACT_APP_NEWS_API
+  const apiKey = process.env.REACT_APP_NEWS_API;
 
   return (
     <BrowserRouter>
@@ -29,6 +29,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="general"
+                apiKey={apiKey}
               />
             }
           />
@@ -41,6 +42,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="business"
+                apiKey={apiKey}
               />
             }
           />
@@ -53,6 +55,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="entertainment"
+                apiKey={apiKey}
               />
             }
           />
@@ -65,6 +68,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="health"
+                apiKey={apiKey}
               />
             }
           />
@@ -77,6 +81,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="science"
+                apiKey={apiKey}
               />
             }
           />
@@ -89,6 +94,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="sports"
+                apiKey={apiKey}
               />
             }
           />
@@ -101,6 +107,7 @@ const App = () => {
                 pageSize={pageSize}
                 country="in"
                 category="technology"
+                apiKey={apiKey}
               />
             }
           />
